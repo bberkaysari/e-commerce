@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Repositories\Variant;
+
+use App\Models\ProductVariant;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+interface VariantRepositoryInterface
+{
+    public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator;
+
+    public function findById(int $id): ?ProductVariant;
+
+    public function findForUpdate(int $id): ?ProductVariant;
+
+    public function create(array $data): ProductVariant;
+
+    public function update(ProductVariant $variant, array $data): ProductVariant;
+
+    public function save(ProductVariant $variant): ProductVariant;
+}
