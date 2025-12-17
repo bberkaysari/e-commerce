@@ -18,6 +18,8 @@ class CartItem extends Model
         'unit_price' => 'decimal:2',
     ];
 
+    protected $appends = ['subtotal'];
+
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
@@ -26,5 +28,10 @@ class CartItem extends Model
     public function variant(): BelongsTo
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    public function getSubtotalAttribute(): string
+    {
+        return bcmul((string) $this->unit_price, (string) $this->quantity, 2);
     }
 }

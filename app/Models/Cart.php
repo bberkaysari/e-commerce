@@ -13,6 +13,8 @@ class Cart extends Model
         'status',
     ];
 
+    protected $appends = ['total'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -21,5 +23,12 @@ class Cart extends Model
     public function items(): HasMany
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    public function getTotalAttribute(): string
+    {
+        return $this->items->sum(function ($item) {
+            return bcmul((string) $item->unit_price, (string) $item->quantity, 2);
+        });
     }
 }
