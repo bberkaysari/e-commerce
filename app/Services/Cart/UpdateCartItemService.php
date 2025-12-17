@@ -31,14 +31,7 @@ class UpdateCartItemService
 
             $cart = $this->cartRepository->getOrCreateActiveCart($userId);
 
-            $item = $this->cartItemRepository
-                ->findByCartAndVariant($cart->id, $variantId);
-
-            if (!$item) {
-                throw new DomainException('Cart item not found', 404);
-            }
-
-            $this->cartItemRepository->updateQuantity($item, $qty);
+            $this->cartItemRepository->updateQuantityByCartVariant($cart->id, $variantId, $qty);
 
             return $this->cartRepository->getActiveCartWithItems($userId);
         } catch (DomainException $e) {

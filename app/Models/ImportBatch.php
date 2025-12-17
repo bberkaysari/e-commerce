@@ -11,6 +11,7 @@ class ImportBatch extends Model
     protected $fillable = [
         'user_id',
         'status',
+        'file_name',
         'file_path',
         'total_rows',
         'processed_rows',

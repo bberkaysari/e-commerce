@@ -18,6 +18,7 @@ return new class extends Migration {
             // PENDING / RUNNING / COMPLETED / FAILED
             $table->string('status')->default('PENDING')->index();
 
+            $table->string('file_name');
             $table->string('file_path');
 
             $table->unsignedInteger('total_rows')->default(0);

@@ -68,7 +68,7 @@ class ProcessProductImport implements ShouldQueue
                         'header_count' => count($header),
                         'row_count' => count($row),
                     ]);
-                    $batchRepository->incrementFailed($batch);
+                    $batchRepository->incrementFailed($batch->id);
                     continue;
                 }
 
@@ -103,14 +103,14 @@ class ProcessProductImport implements ShouldQueue
                         'status' => true,
                     ]);
 
-                    $batchRepository->incrementProcessed($batch);
+                    $batchRepository->incrementProcessed($batch->id);
                 } catch (\Throwable $e) {
                     Log::error('Failed to import row', [
                         'batch_id' => $this->batchId,
                         'row' => $rowIndex,
                         'error' => $e->getMessage(),
                     ]);
-                    $batchRepository->incrementFailed($batch);
+                    $batchRepository->incrementFailed($batch->id);
                 }
             }
 

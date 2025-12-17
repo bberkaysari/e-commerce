@@ -33,6 +33,7 @@ class ImportProductsService
             $batch = $this->batchRepository->create([
                 'user_id' => $userId,
                 'file_name' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
                 'total_rows' => 0,
                 'processed_rows' => 0,
                 'failed_rows' => 0,

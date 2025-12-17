@@ -16,9 +16,11 @@ class StoreVariantRequest extends FormRequest
 
     public function rules(): array
     {
+        $variantId = $this->route('id');
+
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
-            'sku' => ['required', 'string', 'max:255', 'unique:product_variants,sku'],
+            'sku' => ['required', 'string', 'max:255', 'unique:product_variants,sku,' . $variantId],
             'price' => ['required', 'numeric', 'min:0'],
             'stock_quantity' => ['required', 'integer', 'min:0'],
             'attributes' => ['nullable', 'array'],
