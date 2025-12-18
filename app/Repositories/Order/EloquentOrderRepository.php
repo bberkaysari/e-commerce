@@ -44,12 +44,4 @@ class EloquentOrderRepository implements OrderRepositoryInterface
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
-    public function updateTotals(Order $order): Order
-{
-    $total = $order->items()->sum('line_total'); // decimal kolonun varsa direkt toplar
-    $order->total_amount = number_format((float) $total, 2, '.', '');
-    $order->save();
-
-    return $order->fresh();
-}
 }
