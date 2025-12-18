@@ -42,33 +42,33 @@ class RepositoryServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Product
+        
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
 
-        // Variant
+        
         $this->app->bind(VariantRepositoryInterface::class, EloquentVariantRepository::class);
 
-        // Cart + CartItem
+        
         $this->app->bind(CartRepositoryInterface::class, EloquentCartRepository::class);
         $this->app->bind(CartItemRepositoryInterface::class, EloquentCartItemRepository::class);
 
-        // Order
+        
         $this->app->bind(OrderRepositoryInterface::class, EloquentOrderRepository::class);
         $this->app->bind(OrderItemRepositoryInterface::class, EloquentOrderItemRepository::class);
         $this->app->bind(OrderAddressRepositoryInterface::class, EloquentOrderAddressRepository::class);
 
-        // Import
+       
         $this->app->bind(ImportBatchRepositoryInterface::class, EloquentImportBatchRepository::class);
 
-        // User
+        
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
 
-        // Payment
+       
         $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
     }
 
     public function boot(): void
     {
-        // Şimdilik boş. (Gerekirse observer/event binding vs. burada yapılır)
+        
     }
 }
