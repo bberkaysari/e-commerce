@@ -26,6 +26,7 @@ class AuthController extends Controller
     }
 
     public function login(LoginRequest $request): JsonResponse
+    
     {
         $result = $this->authService->login(
             $request->email,
@@ -35,7 +36,9 @@ class AuthController extends Controller
         if (!$result) {
             return response()->json([
                 'error' => [
-                    'message' => 'Invalid credentials',
+                    'message' => 'Gecersiz kimlik bilgileri'
+                    
+                    
                 ],
             ], 401);
         }
@@ -53,7 +56,9 @@ class AuthController extends Controller
 
         return response()->json([
             'data' => [
-                'message' => 'Logged out successfully',
+                'message' => 'Cikis yapildi',
+                'message_en' => 'Logged out succesfully'
+                
             ],
         ]);
     }

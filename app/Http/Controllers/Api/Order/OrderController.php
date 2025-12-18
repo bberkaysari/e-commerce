@@ -12,6 +12,7 @@ use App\Services\Order\PlaceOrderService;
 use App\Services\Order\RefundOrderService;
 use Illuminate\Http\JsonResponse;
 
+
 class OrderController extends Controller
 {
     public function checkout(CheckoutRequest $request, PlaceOrderService $service): JsonResponse
@@ -38,7 +39,7 @@ class OrderController extends Controller
 
         if (!$order) {
             return response()->json([
-                'error' => ['message' => 'Order not found'],
+                'error' => ['message' => 'Order bulunamadi'],
             ], 404);
         }
 
@@ -58,7 +59,7 @@ class OrderController extends Controller
 
         return response()->json([
             'data' => $order,
-            'message' => 'Order cancelled successfully',
+            'message' => 'Order basariyla iptal edildi',
         ], 200);
     }
 
@@ -68,7 +69,7 @@ class OrderController extends Controller
 
         return response()->json([
             'data' => $order,
-            'message' => 'Order refunded successfully',
+            'message' => 'Order geri ödeme talebi basariyla oluşturuldu',
         ], 200);
     }
 }

@@ -41,10 +41,14 @@ class AddToCartService
                     throw new InactiveVariantException($variantId);
                 }
 
-                // Opsiyonel: stok 0 ise sepete ekleme (istersen açalım)
-                // if ((int) $variant->stock_quantity <= 0) {
-                //     throw new DomainException('Variant is out of stock', 422);
-                // }
+                // Stok kontrolü: Sepete eklerken de kontrol et
+                $available = (int) $variant->stock_quantity;
+                if ($available < $qty) {
+                    throw new DomainException(
+                        "Insufficient stock for variant {$variantId}. Requested: {$qty}, Available: {$available}",
+                        422
+                    );
+                }
 
                 $cart = $this->cartRepository->getOrCreateActiveCart($userId);
 

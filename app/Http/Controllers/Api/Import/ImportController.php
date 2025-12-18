@@ -8,6 +8,7 @@ use App\Repositories\Import\ImportBatchRepositoryInterface;
 use App\Services\Import\ImportProductsService;
 use Illuminate\Http\JsonResponse;
 
+
 class ImportController extends Controller
 {
     public function import(
@@ -21,7 +22,7 @@ class ImportController extends Controller
 
         return response()->json([
             'data' => $batch,
-            'message' => 'Import started successfully',
+            'message' => 'Import basariyla baslatildi',
         ], 202);
     }
 
@@ -30,10 +31,10 @@ class ImportController extends Controller
         $batch = $batchRepository->findById($batchId);
 
         if (!$batch) {
-            return response()->json(['error' => ['message' => 'Batch not found']], 404);
+            return response()->json(['error' => ['message' => 'Batch bulunamadi']], 404);
         }
 
-        // opsiyonel: sadece kendi batch’ini görebilsin
+        
         if ((int) $batch->user_id !== (int) auth()->id()) {
             return response()->json(['error' => ['message' => 'Unauthorized']], 403);
         }

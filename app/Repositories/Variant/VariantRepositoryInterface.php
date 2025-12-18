@@ -11,6 +11,8 @@ interface VariantRepositoryInterface
 
     public function findById(int $id): ?ProductVariant;
 
+    public function findBySku(string $sku): ?ProductVariant;
+
     public function findForUpdate(int $id): ?ProductVariant;
 
     public function create(array $data): ProductVariant;

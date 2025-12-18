@@ -3,6 +3,7 @@
 namespace App\Services\Cart;
 
 use App\Exceptions\DomainException;
+use App\Exceptions\InactiveVariantException;
 use App\Exceptions\VariantNotFoundException;
 use App\Repositories\Cart\CartItemRepositoryInterface;
 use App\Repositories\Cart\CartRepositoryInterface;
@@ -23,10 +24,29 @@ class UpdateCartItemService
         $variantId = (int) $data['variant_id'];
         $qty = (int) $data['quantity'];
 
+        // Quantity validation
+        if ($qty <= 0) {
+            throw new DomainException('Quantity must be greater than zero', 422);
+        }
+
         try {
             $variant = $this->variantRepository->findById($variantId);
             if (!$variant) {
                 throw new VariantNotFoundException($variantId);
+            }
+
+            // Variant aktif mi kontrol et
+            if (!(bool) $variant->status) {
+                throw new InactiveVariantException($variantId);
+            }
+
+            // Stok kontrolü
+            $available = (int) $variant->stock_quantity;
+            if ($available < $qty) {
+                throw new DomainException(
+                    "Insufficient stock for variant {$variantId}. Requested: {$qty}, Available: {$available}",
+                    422
+                );
             }
 
             $cart = $this->cartRepository->getOrCreateActiveCart($userId);

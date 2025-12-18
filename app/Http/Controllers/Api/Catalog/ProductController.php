@@ -7,6 +7,7 @@ use App\Http\Requests\Catalog\StoreProductRequest;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 
+
 class ProductController extends Controller
 {
     public function __construct(
@@ -36,7 +37,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'error' => [
-                    'message' => 'Product not found',
+                    'message' => 'Urun bulunamadi',
                 ],
             ], 404);
         }
@@ -51,7 +52,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'error' => [
-                    'message' => 'Product not found',
+                    'message' => 'Urun bulunamadi',
                 ],
             ], 404);
         }

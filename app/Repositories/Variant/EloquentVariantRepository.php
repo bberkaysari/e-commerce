@@ -34,6 +34,11 @@ class EloquentVariantRepository implements VariantRepositoryInterface
         return ProductVariant::query()->find($id);
     }
 
+    public function findBySku(string $sku): ?ProductVariant
+    {
+        return ProductVariant::query()->where('sku', $sku)->with('product')->first();
+    }
+
     public function findForUpdate(int $id): ?ProductVariant
     {
         return ProductVariant::query()->where('id', $id)->lockForUpdate()->first();

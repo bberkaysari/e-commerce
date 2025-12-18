@@ -4,6 +4,7 @@ namespace App\Services\Order;
 
 use App\Exceptions\DomainException;
 use App\Repositories\Order\OrderRepositoryInterface;
+use App\Repositories\Payment\PaymentRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 class PaymentService
 {
     public function __construct(
-        private readonly OrderRepositoryInterface $orderRepository
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly PaymentRepositoryInterface $paymentRepository
     ) {}
 
     /**
@@ -26,9 +28,10 @@ class PaymentService
         $userId = (int) $data['user_id'];
         $orderId = (int) $data['order_id'];
         $method = $data['payment_method'] ?? null;
+        $details = $data['payment_details'] ?? null;
 
         try {
-            return DB::transaction(function () use ($userId, $orderId, $method) {
+            return DB::transaction(function () use ($userId, $orderId, $method, $details) {
                 $order = $this->orderRepository->findById($orderId);
 
                 if (!$order) {
@@ -43,17 +46,24 @@ class PaymentService
                     throw new DomainException('Order is not pending payment', Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
 
-                // Fake payment success: mark order as PAID
+                // Create payment record
+                $transactionId = 'TXN-' . $order->id . '-' . now()->format('YmdHis');
+                $payment = $this->paymentRepository->create([
+                    'order_id' => $order->id,
+                    'payment_method' => $method,
+                    'amount' => $order->total_amount,
+                    'status' => 'COMPLETED',
+                    'transaction_id' => $transactionId,
+                    'payment_details' => $details,
+                ]);
+
+                // Mark order as PAID
                 $this->orderRepository->updateStatus($order, 'PAID');
 
                 $fresh = $this->orderRepository->findByIdWithDetails($order->id);
 
                 return [
-                    'payment' => [
-                        'status' => 'PAID',
-                        'method' => $method,
-                        'reference' => 'PAY-' . $order->id . '-' . now()->format('YmdHis'),
-                    ],
+                    'payment' => $payment,
                     'order' => $fresh,
                 ];
             }, 3);

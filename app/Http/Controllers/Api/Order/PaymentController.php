@@ -7,6 +7,7 @@ use App\Http\Requests\Order\PayOrderRequest;
 use App\Services\Order\PaymentService;
 use Illuminate\Http\JsonResponse;
 
+
 class PaymentController extends Controller
 {
     public function pay(PayOrderRequest $request, PaymentService $service): JsonResponse

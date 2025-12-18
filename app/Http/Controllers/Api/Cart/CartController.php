@@ -11,6 +11,7 @@ use App\Services\Cart\RemoveCartItemService;
 use App\Services\Cart\UpdateCartItemService;
 use Illuminate\Http\JsonResponse;
 
+
 class CartController extends Controller
 {
     public function show(CartRepositoryInterface $cartRepository): JsonResponse

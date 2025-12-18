@@ -82,26 +82,46 @@ class ProcessProductImport implements ShouldQueue
                         throw new \RuntimeException('Missing required fields: name/sku');
                     }
 
-                    $product = $productRepository->create([
-                        'name' => $name,
-                        'description' => $data['description'] ?? null,
-                        'status' => isset($data['status']) ? (bool) $data['status'] : true,
-                    ]);
+                    // Check if variant with SKU already exists
+                    $existingVariant = $variantRepository->findBySku($sku);
 
-                    $attrs = [];
-                    if (!empty($data['attributes'])) {
-                        $decoded = json_decode((string) $data['attributes'], true);
-                        $attrs = is_array($decoded) ? $decoded : [];
+                    if ($existingVariant) {
+                        // Update existing variant
+                        $variantRepository->update($existingVariant, [
+                            'price' => (string) ($data['price'] ?? $existingVariant->price),
+                            'stock_quantity' => (int) ($data['stock_quantity'] ?? $existingVariant->stock_quantity),
+                        ]);
+
+                        // Update product if needed
+                        if ($existingVariant->product) {
+                            $productRepository->update($existingVariant->product, [
+                                'name' => $name,
+                                'description' => $data['description'] ?? null,
+                            ]);
+                        }
+                    } else {
+                        // Create new product and variant
+                        $product = $productRepository->create([
+                            'name' => $name,
+                            'description' => $data['description'] ?? null,
+                            'status' => isset($data['status']) ? (bool) $data['status'] : true,
+                        ]);
+
+                        $attrs = [];
+                        if (!empty($data['attributes'])) {
+                            $decoded = json_decode((string) $data['attributes'], true);
+                            $attrs = is_array($decoded) ? $decoded : [];
+                        }
+
+                        $variantRepository->create([
+                            'product_id' => $product->id,
+                            'sku' => $sku,
+                            'price' => (string) ($data['price'] ?? '0.00'),
+                            'stock_quantity' => (int) ($data['stock_quantity'] ?? 0),
+                            'attributes' => $attrs,
+                            'status' => true,
+                        ]);
                     }
-
-                    $variantRepository->create([
-                        'product_id' => $product->id,
-                        'sku' => $sku,
-                        'price' => (string) ($data['price'] ?? '0.00'),
-                        'stock_quantity' => (int) ($data['stock_quantity'] ?? 0),
-                        'attributes' => $attrs,
-                        'status' => true,
-                    ]);
 
                     $batchRepository->incrementProcessed($batch->id);
                 } catch (\Throwable $e) {

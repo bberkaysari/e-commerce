@@ -106,9 +106,8 @@ class PlaceOrderService
                 ]]);
 
                 // update order total
-                $this->orderRepository->updateTotals($order, [
-                    'total_amount' => $total,
-                ]);
+                $order->total_amount = $total;
+                $order->save();
 
                 $this->cartRepository->markCheckedOut($cart);
 

@@ -7,6 +7,7 @@ use App\Http\Requests\Catalog\StoreVariantRequest;
 use App\Services\Product\VariantService;
 use Illuminate\Http\JsonResponse;
 
+
 class VariantController extends Controller
 {
     public function __construct(
@@ -36,7 +37,7 @@ class VariantController extends Controller
         if (!$variant) {
             return response()->json([
                 'error' => [
-                    'message' => 'Variant not found',
+                    'message' => 'Variant bulunamadi',
                 ],
             ], 404);
         }
@@ -51,7 +52,7 @@ class VariantController extends Controller
         if (!$variant) {
             return response()->json([
                 'error' => [
-                    'message' => 'Variant not found',
+                    'message' => 'Variant bulunamadi',
                 ],
             ], 404);
         }
