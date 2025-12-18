@@ -4,8 +4,9 @@ namespace App\Repositories\Cart;
 
 use App\Exceptions\DomainException;
 use App\Models\CartItem;
+use App\Repositories\Interfaces\CartItemRepositoryInterface;
 
-class EloquentCartItemRepository implements CartItemRepositoryInterface
+class CartItemRepository implements CartItemRepositoryInterface
 {
     public function findByCartAndVariant(int $cartId, int $variantId): ?CartItem
     {

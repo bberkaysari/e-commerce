@@ -3,8 +3,9 @@
 namespace App\Repositories\Import;
 
 use App\Models\ImportBatch;
+use App\Repositories\Interfaces\ImportBatchRepositoryInterface;
 
-class EloquentImportBatchRepository implements ImportBatchRepositoryInterface
+class ImportBatchRepository implements ImportBatchRepositoryInterface
 {
     public function create(array $data): ImportBatch
     {

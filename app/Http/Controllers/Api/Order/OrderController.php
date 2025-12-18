@@ -6,70 +6,85 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\CancelOrderRequest;
 use App\Http\Requests\Order\CheckoutRequest;
 use App\Http\Requests\Order\RefundOrderRequest;
-use App\Repositories\Order\OrderRepositoryInterface;
-use App\Services\Order\CancelOrderService;
-use App\Services\Order\PlaceOrderService;
-use App\Services\Order\RefundOrderService;
+use App\Services\Interfaces\CancelOrderServiceInterface;
+use App\Services\Interfaces\OrderQueryServiceInterface;
+use App\Services\Interfaces\PlaceOrderServiceInterface;
+use App\Services\Interfaces\RefundOrderServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 
 class OrderController extends Controller
 {
-    public function checkout(CheckoutRequest $request, PlaceOrderService $service): JsonResponse
-    {
-        $order = $service->execute([
-            'user_id' => (int) auth()->id(),
-            'shipping' => (array) $request->shipping,
-            'notes' => $request->notes,
-        ]);
-
-        return response()->json(['data' => $order], 201);
+    public function __construct(
+        private readonly PlaceOrderServiceInterface $placeOrderService,
+        private readonly CancelOrderServiceInterface $cancelOrderService,
+        private readonly RefundOrderServiceInterface $refundOrderService,
+        private readonly OrderQueryServiceInterface $orderQueryService,
+    ) {
     }
 
-    public function index(OrderRepositoryInterface $repository): JsonResponse
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
-        $orders = $repository->paginate((int) auth()->id());
+        try {
+            $order = $this->placeOrderService->execute([
+                'user_id' => (int) auth()->id(),
+                'shipping' => (array) $request->shipping,
+                'notes' => $request->notes,
+            ]);
 
-        return response()->json($orders, 200);
-    }
-
-    public function show(int $id, OrderRepositoryInterface $repository): JsonResponse
-    {
-        $order = $repository->findByIdWithDetails($id);
-
-        if (!$order) {
-            return response()->json([
-                'error' => ['message' => 'Order bulunamadi'],
-            ], 404);
+            return response()->json(['data' => $order], 201);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'OrderController@checkout');
         }
+    }
 
-        // Opsiyonel: sadece kendi order’ını görebilsin
-        if ((int) $order->user_id !== (int) auth()->id()) {
-            return response()->json([
-                'error' => ['message' => 'Unauthorized'],
-            ], 403);
+    public function index(): JsonResponse
+    {
+        try {
+            $orders = $this->orderQueryService->paginateForUser((int) auth()->id());
+
+            return response()->json($orders, 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'OrderController@index');
         }
-
-        return response()->json(['data' => $order], 200);
     }
 
-    public function cancel(int $id, CancelOrderRequest $request, CancelOrderService $service): JsonResponse
+    public function show(int $id): JsonResponse
     {
-        $order = $service->execute($id, (int) auth()->id());
+        try {
+            $order = $this->orderQueryService->findOwnedOrder($id, (int) auth()->id());
 
-        return response()->json([
-            'data' => $order,
-            'message' => 'Order basariyla iptal edildi',
-        ], 200);
+            return response()->json(['data' => $order], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'OrderController@show');
+        }
     }
 
-    public function refund(int $id, RefundOrderRequest $request, RefundOrderService $service): JsonResponse
+    public function cancel(int $id, CancelOrderRequest $request): JsonResponse
     {
-        $order = $service->execute($id, (int) auth()->id());
+        try {
+            $order = $this->cancelOrderService->execute($id, (int) auth()->id());
 
-        return response()->json([
-            'data' => $order,
-            'message' => 'Order geri ödeme talebi basariyla oluşturuldu',
-        ], 200);
+            return response()->json([
+                'data' => $order,
+                'message' => 'Order basariyla iptal edildi',
+            ], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'OrderController@cancel');
+        }
     }
+
+    public function refund(int $id, RefundOrderRequest $request): JsonResponse
+    {
+        try {
+            $order = $this->refundOrderService->execute($id, (int) auth()->id());
+
+            return response()->json([
+                'data' => $order,
+                'message' => 'Order geri ödeme talebi basariyla oluşturuldu',
+            ], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'OrderController@refund');
+        }
+}
 }

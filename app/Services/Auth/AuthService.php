@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Services\Auth;
+use App\Services\Interfaces\AuthServiceInterface;
 
-use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
-class AuthService
+class AuthService implements AuthServiceInterface
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository

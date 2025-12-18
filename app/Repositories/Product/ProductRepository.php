@@ -3,9 +3,10 @@
 namespace App\Repositories\Product;
 
 use App\Models\Product;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class EloquentProductRepository implements ProductRepositoryInterface
+class ProductRepository implements ProductRepositoryInterface
 {
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {

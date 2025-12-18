@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Repositories\Import\ImportBatchRepositoryInterface;
-use App\Repositories\Product\ProductRepositoryInterface;
-use App\Repositories\Variant\VariantRepositoryInterface;
+use App\Repositories\Interfaces\ImportBatchRepositoryInterface;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Repositories\Interfaces\VariantRepositoryInterface;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -55,12 +55,12 @@ class ProcessProductImport implements ShouldQueue
             while (($row = fgetcsv($fh)) !== false) {
                 $rowIndex++;
 
-                // boş satır
+            
                 if (count(array_filter($row, fn($v) => $v !== null && $v !== '')) === 0) {
                     continue;
                 }
 
-                // header-row mismatch guard
+                
                 if (count($row) !== count($header)) {
                     Log::warning('CSV column mismatch', [
                         'batch_id' => $this->batchId,
@@ -82,17 +82,17 @@ class ProcessProductImport implements ShouldQueue
                         throw new \RuntimeException('Missing required fields: name/sku');
                     }
 
-                    // Check if variant with SKU already exists
+                    
                     $existingVariant = $variantRepository->findBySku($sku);
 
                     if ($existingVariant) {
-                        // Update existing variant
+                       
                         $variantRepository->update($existingVariant, [
                             'price' => (string) ($data['price'] ?? $existingVariant->price),
                             'stock_quantity' => (int) ($data['stock_quantity'] ?? $existingVariant->stock_quantity),
                         ]);
 
-                        // Update product if needed
+                       
                         if ($existingVariant->product) {
                             $productRepository->update($existingVariant->product, [
                                 'name' => $name,
@@ -100,7 +100,7 @@ class ProcessProductImport implements ShouldQueue
                             ]);
                         }
                     } else {
-                        // Create new product and variant
+                        
                         $product = $productRepository->create([
                             'name' => $name,
                             'description' => $data['description'] ?? null,

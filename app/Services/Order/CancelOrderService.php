@@ -1,22 +1,24 @@
 <?php
 
 namespace App\Services\Order;
+use App\Services\Interfaces\CancelOrderServiceInterface;
 
 use App\Exceptions\DomainException;
-use App\Repositories\Order\OrderRepositoryInterface;
-use App\Repositories\Variant\VariantRepositoryInterface;
+use App\Models\Order;
+use App\Repositories\Interfaces\OrderRepositoryInterface;
+use App\Repositories\Interfaces\VariantRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-class CancelOrderService
+class CancelOrderService implements CancelOrderServiceInterface
 {
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly VariantRepositoryInterface $variantRepository
     ) {}
 
-    public function execute(int $orderId, int $userId)
+    public function execute(int $orderId, int $userId): Order
     {
         try {
             return DB::transaction(function () use ($orderId, $userId) {

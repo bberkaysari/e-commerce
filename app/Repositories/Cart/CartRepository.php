@@ -3,8 +3,9 @@
 namespace App\Repositories\Cart;
 
 use App\Models\Cart;
+use App\Repositories\Interfaces\CartRepositoryInterface;
 
-class EloquentCartRepository implements CartRepositoryInterface
+class CartRepository implements CartRepositoryInterface
 {
     public function getOrCreateActiveCart(int $userId): Cart
     {

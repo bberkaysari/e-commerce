@@ -5,12 +5,14 @@ namespace App\Services\Cart;
 use App\Exceptions\DomainException;
 use App\Exceptions\InactiveVariantException;
 use App\Exceptions\VariantNotFoundException;
-use App\Repositories\Cart\CartItemRepositoryInterface;
-use App\Repositories\Cart\CartRepositoryInterface;
-use App\Repositories\Variant\VariantRepositoryInterface;
+use App\Models\Cart;
+use App\Repositories\Interfaces\CartItemRepositoryInterface;
+use App\Repositories\Interfaces\CartRepositoryInterface;
+use App\Repositories\Interfaces\VariantRepositoryInterface;
+use App\Services\Interfaces\UpdateCartItemServiceInterface;
 use Illuminate\Support\Facades\Log;
 
-class UpdateCartItemService
+class UpdateCartItemService implements UpdateCartItemServiceInterface
 {
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
@@ -18,7 +20,7 @@ class UpdateCartItemService
         private readonly VariantRepositoryInterface $variantRepository,
     ) {}
 
-    public function execute(array $data)
+    public function execute(array $data): ?Cart
     {
         $userId = (int) $data['user_id'];
         $variantId = (int) $data['variant_id'];

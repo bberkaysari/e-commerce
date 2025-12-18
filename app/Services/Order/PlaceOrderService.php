@@ -1,21 +1,23 @@
 <?php
 
 namespace App\Services\Order;
+use App\Services\Interfaces\PlaceOrderServiceInterface;
 
 use App\Exceptions\CartEmptyException;
 use App\Exceptions\DomainException;
 use App\Exceptions\InsufficientStockException;
 use App\Exceptions\InactiveVariantException;
 use App\Exceptions\VariantNotFoundException;
-use App\Repositories\Cart\CartRepositoryInterface;
-use App\Repositories\Order\OrderAddressRepositoryInterface;
-use App\Repositories\Order\OrderItemRepositoryInterface;
-use App\Repositories\Order\OrderRepositoryInterface;
-use App\Repositories\Variant\VariantRepositoryInterface;
+use App\Models\Order;
+use App\Repositories\Interfaces\CartRepositoryInterface;
+use App\Repositories\Interfaces\OrderAddressRepositoryInterface;
+use App\Repositories\Interfaces\OrderItemRepositoryInterface;
+use App\Repositories\Interfaces\OrderRepositoryInterface;
+use App\Repositories\Interfaces\VariantRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class PlaceOrderService
+class PlaceOrderService implements PlaceOrderServiceInterface
 {
     public function __construct(
         private readonly CartRepositoryInterface $cartRepository,
@@ -25,7 +27,7 @@ class PlaceOrderService
         private readonly OrderAddressRepositoryInterface $orderAddressRepository,
     ) {}
 
-    public function execute(array $data)
+    public function execute(array $data): Order
     {
         $userId = (int) $data['user_id'];
         $shipping = (array) ($data['shipping'] ?? []);

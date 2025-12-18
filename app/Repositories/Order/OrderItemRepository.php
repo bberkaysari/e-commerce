@@ -3,8 +3,9 @@
 namespace App\Repositories\Order;
 
 use App\Models\OrderItem;
+use App\Repositories\Interfaces\OrderItemRepositoryInterface;
 
-class EloquentOrderItemRepository implements OrderItemRepositoryInterface
+class OrderItemRepository implements OrderItemRepositoryInterface
 {
     public function bulkCreate(array $rows): void
     {

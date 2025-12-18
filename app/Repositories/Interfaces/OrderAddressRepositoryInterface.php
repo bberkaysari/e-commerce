@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Repositories\Order;
-
-use App\Models\OrderAddress;
+namespace App\Repositories\Interfaces;
 
 interface OrderAddressRepositoryInterface
 {
     public function bulkCreate(array $rows): void;
-    
 }

@@ -1,15 +1,16 @@
 <?php
 
 namespace App\Services\Order;
+use App\Services\Interfaces\PaymentServiceInterface;
 
 use App\Exceptions\DomainException;
-use App\Repositories\Order\OrderRepositoryInterface;
-use App\Repositories\Payment\PaymentRepositoryInterface;
+use App\Repositories\Interfaces\OrderRepositoryInterface;
+use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-class PaymentService
+class PaymentService implements PaymentServiceInterface
 {
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,

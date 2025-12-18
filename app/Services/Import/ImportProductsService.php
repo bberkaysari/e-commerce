@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Services\Import;
+use App\Services\Interfaces\ImportServiceInterface;
 
 use App\Exceptions\DomainException;
 use App\Jobs\ProcessProductImport;
-use App\Repositories\Import\ImportBatchRepositoryInterface;
+use App\Repositories\Interfaces\ImportBatchRepositoryInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
-class ImportProductsService
+class ImportProductsService implements ImportServiceInterface
 {
     public function __construct(
         private readonly ImportBatchRepositoryInterface $batchRepository
@@ -51,5 +52,20 @@ class ImportProductsService
 
             throw new DomainException('Unexpected error while starting import', 500);
         }
+    }
+
+    public function getBatchForUser(int $batchId, int $userId)
+    {
+        $batch = $this->batchRepository->findById($batchId);
+
+        if (!$batch) {
+            return null;
+        }
+
+        if ((int) $batch->user_id !== $userId) {
+            return false;
+        }
+
+        return $batch;
     }
 }

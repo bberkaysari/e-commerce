@@ -3,8 +3,9 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 
-class EloquentUserRepository implements UserRepositoryInterface
+class UserRepository implements UserRepositoryInterface
 {
     public function create(array $data): User
     {

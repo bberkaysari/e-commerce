@@ -3,8 +3,9 @@
 namespace App\Repositories\Payment;
 
 use App\Models\Payment;
+use App\Repositories\Interfaces\PaymentRepositoryInterface;
 
-class EloquentPaymentRepository implements PaymentRepositoryInterface
+class PaymentRepository implements PaymentRepositoryInterface
 {
     public function create(array $data): Payment
     {

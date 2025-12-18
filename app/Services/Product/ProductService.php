@@ -2,10 +2,11 @@
 
 namespace App\Services\Product;
 
-use App\Repositories\Product\ProductRepositoryInterface;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\Interfaces\ProductServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class ProductService
+class ProductService implements ProductServiceInterface
 {
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository

@@ -2,10 +2,11 @@
 
 namespace App\Services\Product;
 
-use App\Repositories\Variant\VariantRepositoryInterface;
+use App\Repositories\Interfaces\VariantRepositoryInterface;
+use App\Services\Interfaces\VariantServiceInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class VariantService
+class VariantService implements VariantServiceInterface
 {
     public function __construct(
         private readonly VariantRepositoryInterface $variantRepository

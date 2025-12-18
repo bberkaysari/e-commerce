@@ -2,49 +2,19 @@
 
 namespace App\Services\Cart;
 
-use App\Repositories\Cart\CartItemRepositoryInterface;
-use App\Repositories\Cart\CartRepositoryInterface;
+use App\Models\Cart;
+use App\Repositories\Interfaces\CartRepositoryInterface;
+use App\Services\Interfaces\CartServiceInterface;
 
-class CartService
+class CartService implements CartServiceInterface
 {
     public function __construct(
-        private readonly CartRepositoryInterface $cartRepository,
-        private readonly CartItemRepositoryInterface $cartItemRepository
+        private readonly CartRepositoryInterface $cartRepository
     ) {
     }
 
-    public function getCart(int $userId): mixed
+    public function getActiveCart(int $userId): ?Cart
     {
-        return $this->cartRepository->getActiveCartWithItems($userId);
-    }
-
-    public function updateCartItem(int $userId, int $variantId, int $quantity): mixed
-    {
-        $cart = $this->cartRepository->getOrCreateActiveCart($userId);
-
-        $item = $this->cartItemRepository->findByCartAndVariant($cart->id, $variantId);
-
-        if (!$item) {
-            return null;
-        }
-
-        $this->cartItemRepository->updateQuantity($item, $quantity);
-
-        return $this->cartRepository->getActiveCartWithItems($userId);
-    }
-
-    public function removeCartItem(int $userId, int $variantId): mixed
-    {
-        $cart = $this->cartRepository->getOrCreateActiveCart($userId);
-
-        $item = $this->cartItemRepository->findByCartAndVariant($cart->id, $variantId);
-
-        if (!$item) {
-            return null;
-        }
-
-        $this->cartItemRepository->delete($item);
-
         return $this->cartRepository->getActiveCartWithItems($userId);
     }
 }

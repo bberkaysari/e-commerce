@@ -5,55 +5,79 @@ namespace App\Http\Controllers\Api\Cart;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cart\AddToCartRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
-use App\Repositories\Cart\CartRepositoryInterface;
-use App\Services\Cart\AddToCartService;
-use App\Services\Cart\RemoveCartItemService;
-use App\Services\Cart\UpdateCartItemService;
+use App\Services\Interfaces\AddToCartServiceInterface;
+use App\Services\Interfaces\CartServiceInterface;
+use App\Services\Interfaces\RemoveCartItemServiceInterface;
+use App\Services\Interfaces\UpdateCartItemServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 
 class CartController extends Controller
 {
-    public function show(CartRepositoryInterface $cartRepository): JsonResponse
-    {
-        $cart = $cartRepository->getActiveCartWithItems((int) auth()->id());
-
-        return response()->json(['data' => $cart], 200);
+    public function __construct(
+        private readonly CartServiceInterface $cartService,
+        private readonly AddToCartServiceInterface $addToCartService,
+        private readonly UpdateCartItemServiceInterface $updateCartItemService,
+        private readonly RemoveCartItemServiceInterface $removeCartItemService,
+    ) {
     }
 
-    public function add(AddToCartRequest $request, AddToCartService $service): JsonResponse
+    public function show(): JsonResponse
     {
-        $payload = $request->validated();
+        try {
+            $cart = $this->cartService->getActiveCart((int) auth()->id());
 
-        $cart = $service->execute([
-            'user_id' => (int) auth()->id(),
-            'variant_id' => (int) $payload['variant_id'],
-            'quantity' => (int) $payload['quantity'],
-        ]);
-
-        return response()->json(['data' => $cart], 200);
+            return response()->json(['data' => $cart], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'CartController@show');
+        }
     }
 
-    public function update(int $variantId, UpdateCartItemRequest $request, UpdateCartItemService $service): JsonResponse
+    public function add(AddToCartRequest $request): JsonResponse
     {
-        $payload = $request->validated();
+        try {
+            $payload = $request->validated();
 
-        $cart = $service->execute([
-            'user_id' => (int) auth()->id(),
-            'variant_id' => (int) $variantId,
-            'quantity' => (int) $payload['quantity'],
-        ]);
+            $cart = $this->addToCartService->execute([
+                'user_id' => (int) auth()->id(),
+                'variant_id' => (int) $payload['variant_id'],
+                'quantity' => (int) $payload['quantity'],
+            ]);
 
-        return response()->json(['data' => $cart], 200);
+            return response()->json(['data' => $cart], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'CartController@add');
+        }
     }
 
-    public function remove(int $variantId, RemoveCartItemService $service): JsonResponse
+    public function update(int $variantId, UpdateCartItemRequest $request): JsonResponse
     {
-        $cart = $service->execute([
-            'user_id' => (int) auth()->id(),
-            'variant_id' => (int) $variantId,
-        ]);
+        try {
+            $payload = $request->validated();
 
-        return response()->json(['data' => $cart], 200);
+            $cart = $this->updateCartItemService->execute([
+                'user_id' => (int) auth()->id(),
+                'variant_id' => (int) $variantId,
+                'quantity' => (int) $payload['quantity'],
+            ]);
+
+            return response()->json(['data' => $cart], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'CartController@update');
+        }
+    }
+
+    public function remove(int $variantId): JsonResponse
+    {
+        try {
+            $cart = $this->removeCartItemService->execute([
+                'user_id' => (int) auth()->id(),
+                'variant_id' => (int) $variantId,
+            ]);
+
+            return response()->json(['data' => $cart], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'CartController@remove');
+        }
     }
 }

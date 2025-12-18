@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Import;
+namespace App\Repositories\Interfaces;
 
 use App\Models\ImportBatch;
 

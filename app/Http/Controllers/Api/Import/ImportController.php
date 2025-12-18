@@ -4,41 +4,51 @@ namespace App\Http\Controllers\Api\Import;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Import\ImportProductsRequest;
-use App\Repositories\Import\ImportBatchRepositoryInterface;
-use App\Services\Import\ImportProductsService;
+use App\Services\Interfaces\ImportServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 
 class ImportController extends Controller
 {
-    public function import(
-        ImportProductsRequest $request,
-        ImportProductsService $service
-    ): JsonResponse {
-        $batch = $service->execute([
-            'user_id' => (int) auth()->id(),
-            'file' => $request->file('file'),
-        ]);
-
-        return response()->json([
-            'data' => $batch,
-            'message' => 'Import basariyla baslatildi',
-        ], 202);
+    public function __construct(
+        private readonly ImportServiceInterface $importService
+    ) {
     }
 
-    public function status(int $batchId, ImportBatchRepositoryInterface $batchRepository): JsonResponse
+    public function import(
+        ImportProductsRequest $request
+    ): JsonResponse {
+        try {
+            $batch = $this->importService->execute([
+                'user_id' => (int) auth()->id(),
+                'file' => $request->file('file'),
+            ]);
+
+            return response()->json([
+                'data' => $batch,
+                'message' => 'Import basariyla baslatildi',
+            ], 202);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'ImportController@import');
+        }
+    }
+
+    public function status(int $batchId): JsonResponse
     {
-        $batch = $batchRepository->findById($batchId);
+        try {
+            $batch = $this->importService->getBatchForUser($batchId, (int) auth()->id());
 
-        if (!$batch) {
-            return response()->json(['error' => ['message' => 'Batch bulunamadi']], 404);
+            if ($batch === null) {
+                return response()->json(['error' => ['message' => 'Batch bulunamadi']], 404);
+            }
+
+            if ($batch === false) {
+                return response()->json(['error' => ['message' => 'Unauthorized']], 403);
+            }
+
+            return response()->json(['data' => $batch], 200);
+        } catch (\Throwable $e) {
+            return $this->handleException($e, 'ImportController@status');
         }
-
-        
-        if ((int) $batch->user_id !== (int) auth()->id()) {
-            return response()->json(['error' => ['message' => 'Unauthorized']], 403);
-        }
-
-        return response()->json(['data' => $batch], 200);
     }
 }
